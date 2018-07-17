@@ -1,0 +1,50 @@
+#!/usr/bin/groovy
+@Library('pipeline-library-sqli') _
+pipeline {
+    agent any
+    tools {
+        maven 'maven-3-5-3'
+    }
+    stages {
+        stage('Checkout Git') {
+          steps {
+            script { 
+                gitlabCheckout('${branch}','${url}')
+             }
+          }
+        }
+     stage('Deploy To Author') {
+          steps {
+            script { 
+                mavenDeploy('AEM_ENV_STAGING_AIRBUS_AUTHOR','http://18.194.65.34:4502','auto-install-package')
+             }
+          }
+        }
+    
+    stage('Deploy To Publish 1') {
+          steps {
+            script { 
+                mavenDeploy('AEM_ENV_STAGING_AIRBUS_PUBLISH','http://18.194.22.61:4503','auto-install-package') 
+             }
+          }
+        }
+
+    stage('Deploy To Publish 2') {
+          steps {
+            script { 
+                mavenDeploy('AEM_ENV_STAGING_AIRBUS_PUBLISH','http://35.158.141.103:4503','auto-install-package')
+             }
+          }
+        }
+
+    stage('Flush Dispatcher ') {
+            steps {
+               parallel (
+                   "dispatcher author": { flushDispatcher('http://52.58.69.56:80') },
+                   "dispatcher publish 1": { flushDispatcher('http://52.28.15.189:80') },
+                   "dispatcher publish 2": { flushDispatcher('http://35.157.63.10:80') }
+               )
+            }
+       }
+    }
+}

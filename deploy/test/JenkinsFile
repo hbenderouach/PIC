@@ -1,0 +1,48 @@
+#!/usr/bin/groovy
+@Library('pipeline-library-sqli') _
+pipeline {
+    agent any
+    tools {
+        maven 'maven-3-5-3'
+    }
+    stages {
+        stage('Checkout Git') {
+          steps {
+            script { 
+                gitlabCheckout('${branch}','${url}')
+             }
+          }
+        }
+     stage('Deploy To Author') {
+          steps {
+            script { 
+                mavenDeploy('AEM_ENV_TEST_SQLI_AUTHOR','http://172.31.12.47:4502','auto-install-package')
+             }
+          }
+        }
+     stage('Deploy To Publish 1') {
+            steps {
+               script { 
+                   mavenDeploy('AEM_ENV_TEST_SQLI_PUBLISH','http://172.31.4.41:4503','auto-install-package') 
+               }
+            }
+       }
+     stage('Deploy To Publish 2') {
+            steps {
+               script {
+                   mavenDeploy('AEM_ENV_TEST_SQLI_PUBLISH','http://172.31.15.34:4503','auto-install-package') 
+            }
+       }
+     }
+
+    stage('Flush Dispatcher ') {
+            steps {
+               parallel (
+                   "dispatcher author": { flushDispatcher('http://172.31.12.47:80') },
+                   "dispatcher publish 1": { flushDispatcher('http://172.31.4.41:80') },
+                   "dispatcher publish 2": { flushDispatcher('http://172.31.15.34:80') }
+               )
+            }
+       }
+    }
+}

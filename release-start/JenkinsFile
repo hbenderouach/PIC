@@ -1,0 +1,59 @@
+#!/usr/bin/groovy
+@Library('pipeline-library-sqli') _
+pipeline {
+    agent any
+     parameters {
+            choice(
+                name: 'delete_release',
+                choices:"Yes\nNo", 
+                description: "Delete old release ?" )
+    }
+    tools {
+        maven 'maven-3-5-3'
+    }
+
+    stages {
+        stage('Checkout Git') {
+            steps {
+                script { 
+                    gitlabCheckout('${branch}','${url}')
+                }
+            }
+        }
+        stage('Build') {
+            steps {
+                 script { 
+                    mavenInstall()
+                }
+            }
+        }
+        
+         stage('Delete Relase Branch') {
+            steps {
+                script {
+                    if ("${params.delete_release}" == "Yes") {
+		                gitlabDeleteBranch('release-${releaseVersionParam}')
+                        }
+                    }
+                }
+            }
+
+         stage('Relase Start') {
+            steps {
+                 script { 
+                    gitlabPurne('${url}')
+                    mavenReleaseStart('${developmentVersionParam}','${releaseVersionParam}')
+                    }
+                }
+            }
+        stage('Push Release '){
+            steps {
+                 script { 
+                    mavenPushBranchStarted('${releaseVersionParam}','${url}','release')
+                    }
+                }
+		       
+          }
+      }
+        
+    }

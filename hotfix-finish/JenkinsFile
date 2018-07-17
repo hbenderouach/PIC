@@ -1,0 +1,43 @@
+#!/usr/bin/groovy
+@Library('pipeline-library-sqli') _
+pipeline {
+    agent any
+    tools {
+        maven 'maven-3-5-3'
+    }
+
+    stages {
+         stage('Checkout Git') {
+            steps {
+                script {
+                    gitlabBehindMasterDevelop('${url}')
+                    gitlabCheckout('${hotfixToFinish}','${url}')
+                }
+            }
+        }
+        stage('Build') {
+            steps {
+                 script { 
+                    mavenInstall()
+                }
+            }
+        }
+
+         stage('Hotfix Finish') {
+            steps {
+                script { 
+                    mavenFinish('hotfix')
+                    }                
+                }
+            }
+        
+        stage('Push Hotfix '){
+            steps {
+		       script { 
+                    mavenPushBranchFinished('${url}')
+                    }                
+                }
+          }
+      }
+        
+    }
