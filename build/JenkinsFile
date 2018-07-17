@@ -1,5 +1,5 @@
 #!/usr/bin/groovy
-@Library('pipeline-library-sqli') _
+@Library('pipeline-library') _
 pipeline {
     agent any
     tools {
