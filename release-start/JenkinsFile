@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
                     if ("${params.delete_release}" == "Yes") {
-		                gitlabDeleteBranch(${releaseVersionParam})
+		                gitlabDeleteBranch('release-${releaseVersionParam}')
                         }
                     }
                 }
