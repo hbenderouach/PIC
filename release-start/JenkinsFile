@@ -43,7 +43,7 @@ pipeline {
             steps {
                  script { 
                     gitlabPurne('${url}')
-                    mavenReleaseStart()
+                    
                     }
                 }
             }
