@@ -20,6 +20,7 @@ pipeline {
                 }
             }
         }
+		
         stage('Build') {
             steps {
                  script { 
@@ -42,7 +43,7 @@ pipeline {
             steps {
                  script { 
                     gitlabPurne('${url}')
-                    mavenReleaseStart('${developmentVersionParam}','${releaseVersionParam}')
+                    mavenReleaseStart()
                     }
                 }
             }
