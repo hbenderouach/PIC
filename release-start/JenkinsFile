@@ -42,8 +42,8 @@ pipeline {
          stage('Relase Start') {
             steps {
                  script { 
-                    //gitlabPurne('${url}')
-                    mavenReleaseStart('${developmentVersionParam}','${releaseVersionParam}')
+                    gitlabPurne('${url}')
+                    //mavenReleaseStart('${developmentVersionParam}','${releaseVersionParam}')
                     }
                 }
             }
@@ -51,7 +51,7 @@ pipeline {
         stage('Push Release '){
             steps {
                  script { 
-                    mavenPushBranchStarted('${releaseVersionParam}','${url}','release')
+                    //mavenPushBranchStarted('${releaseVersionParam}','${url}','release')
                     }
                 }
 		       
