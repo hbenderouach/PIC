@@ -42,7 +42,7 @@ pipeline {
          stage('Relase Start') {
             steps {
                  script { 
-                    
+                    gitlabPurne('${url}')
                     mavenReleaseStart('${developmentVersionParam}','${releaseVersionParam}')
                     }
                 }
